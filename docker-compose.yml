@@ -1,22 +1,25 @@
-version: '3.9'
+version: '3.8'
 services:
-  db:
-    image: mongo
-    container_name: test-mongo
-    restart: always
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${ENV_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${ENV_PASSWORD}
     ports:
       - 27017:27017
-    environment:
-      - MONGO_INITDB_ROOT_USERNAME=kene
-      - MONGO_INITDB_ROOT_PASSWORD=kenepass
-  db-client:
+    volumes: # optional. Used to preserve database if container is deleted
+      - ./database-data:/data/db
+  mongo-express:
     image: mongo-express
-    restart: always
+    container_name: mongo-express
+    restart: unless-stopped
     ports:
       - 8081:8081
     environment:
-      - ME_CONFIG_MONGODB_ADMINUSERNAME=kene
-      - ME_CONFIG_MONGODB_ADMINPASSWORD=kenepass
-      - ME_CONFIG_MONGODB_URL=mongodb://kene:kenepass@db:27017/
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${ENV_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${ENV_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongodb
     depends_on:
-      - db
+      - mongodb
