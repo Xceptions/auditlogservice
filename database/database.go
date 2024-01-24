@@ -3,7 +3,9 @@ package database
 import (
 	"context"
 	"log"
+	"os"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -11,8 +13,15 @@ import (
 var db *mongo.Database
 
 func ConnectDB() *mongo.Database {
+	err := godotenv.Load(".env")
+	if err != nil {
+		log.Fatalf("Error loading .env file: %s", err)
+	}
+	// Getting the DB Name from .env
+	audit_db_name := os.Getenv("AUDIT_DB_NAME")
+
 	// set client options
-	clientOptions := options.Client().ApplyURI("mongodb://localhost:27017")
+	clientOptions := options.Client().ApplyURI("mongodb://kene:kenepass@127.0.0.1:27017")
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.Background(), clientOptions)
@@ -27,6 +36,6 @@ func ConnectDB() *mongo.Database {
 	}
 
 	// set the database and collection variables
-	db = client.Database("DocumentSearchDBGo")
+	db = client.Database(audit_db_name)
 	return db
 }

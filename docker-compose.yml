@@ -9,8 +9,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${ENV_PASSWORD}
     ports:
       - 27017:27017
-    volumes: # optional. Used to preserve database if container is deleted
-      - ./database-data:/data/db
   mongo-express:
     image: mongo-express
     container_name: mongo-express
