@@ -2,19 +2,23 @@ package main
 
 import (
 	// "fmt"
+	"crypto/rand"
 	"log"
 	"net"
-	"net/http"
 
-	"github.com/gorilla/mux"
-	"github.com/xceptions/golangauditlog/handlers"
+	"github.com/xceptions/auditlogservice/auditlogeventservice/handlers"
 )
 
 // TCP server will be used for accepting
 // audit log
 func spinUpTCPServer() {
 	log.Println("spinning up tcp server")
-	unbufferedChannel := make(chan []byte)
+	token := make([]byte, 4)
+	rand.Read(token)
+	bufferedChannel := make(chan []byte, 4)
+	bufferedChannel <- token
+	bufferedChannel <- token
+	bufferedChannel <- token
 
 	const (
 		CONN_HOST = "localhost"
@@ -33,25 +37,11 @@ func spinUpTCPServer() {
 		if err != nil {
 			log.Fatal("Error accepting: ", err.Error())
 		}
-		handlers.HandleLog(unbufferedChannel, conn)
+		go handlers.HandleEvent(bufferedChannel, conn)
 	}
 }
 
-// HTTP server will be used for querying
-// audit logs
-func spinUpHTTPServer() {
-	log.Println("Starting HTTP Server...")
-
-	router := mux.NewRouter()
-
-	router.HandleFunc("/createuser", handlers.CreateQueryAccount).Methods(http.MethodPost)
-
-	log.Println("API is running!")
-	http.ListenAndServe(":4000", router)
-}
-
-// starts two servers
+// starts servers
 func main() {
-	// spinUpHTTPServer()
 	spinUpTCPServer()
 }

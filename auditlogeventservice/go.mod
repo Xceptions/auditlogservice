@@ -1,10 +1,9 @@
-module github.com/xceptions/golangauditlog
+module github.com/xceptions/auditlogservice/auditlogeventservice
 
 go 1.21.5
 
 require (
 	github.com/golang-jwt/jwt v3.2.2+incompatible
-	github.com/gorilla/mux v1.8.1
 	github.com/joho/godotenv v1.5.1
 	go.mongodb.org/mongo-driver v1.13.1
 	golang.org/x/crypto v0.18.0
