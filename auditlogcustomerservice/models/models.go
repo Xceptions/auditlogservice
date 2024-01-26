@@ -10,9 +10,9 @@ type User struct {
 	Password string
 }
 
-type AuditInput struct {
-	Actor     string      `json:"actor"`
-	EventType string      `json:"action"`
-	When      time.Time   `json:"when"`
+type AuditModel struct {
+	Customer  string      `json:"actor"`
+	Event     string      `json:"action"`
+	Time      time.Time   `json:"when"`
 	Specifics interface{} `json:"details"`
 }
