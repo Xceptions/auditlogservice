@@ -15,7 +15,9 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// var db *mongo.Database
+// we have two db's we need to initialize. A postgres db
+// and a mongodb. The postgres is used for storing user credentials
+// but the mongodb is used for storing events
 
 func ConnectPostgresDB() *gorm.DB {
 	dbURL := "postgresql://kene:kenepass@localhost:5432/postgres"

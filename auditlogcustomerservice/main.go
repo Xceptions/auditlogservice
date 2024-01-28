@@ -17,7 +17,11 @@ func error404(w http.ResponseWriter, r *http.Request) {
 }
 
 // HTTP server will be used for querying
-// audit logs
+// audit logs. We receive the connection from the
+// client, then initialize a new connection to the
+// database. We also create versioned routes for the
+// APIs. Rate-limiting and caching is applied to the
+// querying handler
 
 // TODO: Perform rate-limiting by client ip address
 // because currently, I am rate-limiting the whole
@@ -38,8 +42,6 @@ func spinUpHTTPServer() {
 	apiVersion1.HandleFunc("/createuser", h.CreateQueryAccount).Methods(http.MethodPost)
 	apiVersion1.HandleFunc("/loginuser", h.LoginQueryAccount).Methods(http.MethodPost)
 	apiVersion1.HandleFunc("/getevents/{field}/{value}", helpers.RateLimiter(h.QueryEventsByFieldAndValue)).Methods(http.MethodGet)
-
-	// router.HandleFunc("/createuser", h.CreateQueryAccount).Methods(http.MethodPost)
 
 	log.Println("API is running!")
 	http.ListenAndServe(":4000", router)
