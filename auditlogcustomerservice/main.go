@@ -3,11 +3,11 @@ package main
 import (
 	// "fmt"
 	"log"
-	"net"
 	"net/http"
 
 	"github.com/gorilla/mux"
-	"github.com/xceptions/golangauditlog/handlers"
+	"github.com/xceptions/auditlogservice/auditlogcustomerservice/handlers"
+	"github.com/xceptions/auditlogservice/auditlogcustomerservice/database"
 )
 
 // HTTP server will be used for querying
@@ -15,15 +15,17 @@ import (
 func spinUpHTTPServer() {
 	log.Println("Starting HTTP Server...")
 
+	DB := database.ConnectPostgresDB()
+	h := handlers.New(DB)
 	router := mux.NewRouter()
 
-	router.HandleFunc("/createuser", handlers.CreateQueryAccount).Methods(http.MethodPost)
+	router.HandleFunc("/createuser", h.CreateQueryAccount).Methods(http.MethodPost)
 
 	log.Println("API is running!")
 	http.ListenAndServe(":4000", router)
 }
 
-// starts two servers
+// starts servers
 func main() {
 	spinUpHTTPServer()
 }

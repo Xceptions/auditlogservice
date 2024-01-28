@@ -5,14 +5,30 @@ import (
 	"log"
 	"os"
 
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+
 	"github.com/joho/godotenv"
+	"github.com/xceptions/auditlogservice/auditlogcustomerservice/helpers"
+	"github.com/xceptions/auditlogservice/auditlogcustomerservice/models"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var db *mongo.Database
+// var db *mongo.Database
 
-func ConnectDB() *mongo.Database {
+func ConnectPostgresDB() *gorm.DB {
+	dbURL := "postgresql://kene:kenepass@localhost:5432/postgres"
+
+	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
+	helpers.HandleErr(err)
+
+	db.AutoMigrate(&models.User{})
+
+	return db
+}
+
+func ConnectMongoDB() *mongo.Database {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
@@ -36,6 +52,6 @@ func ConnectDB() *mongo.Database {
 	}
 
 	// set the database and collection variables
-	db = client.Database(audit_db_name)
+	db := client.Database(audit_db_name)
 	return db
 }
