@@ -36,6 +36,7 @@ func spinUpHTTPServer() {
 	apiVersion1.NotFoundHandler = http.HandlerFunc(error404)
 
 	apiVersion1.HandleFunc("/createuser", h.CreateQueryAccount).Methods(http.MethodPost)
+	apiVersion1.HandleFunc("/loginuser", h.LoginQueryAccount).Methods(http.MethodPost)
 	apiVersion1.HandleFunc("/getevents/{field}/{value}", helpers.RateLimiter(h.QueryEventsByFieldAndValue)).Methods(http.MethodGet)
 
 	// router.HandleFunc("/createuser", h.CreateQueryAccount).Methods(http.MethodPost)
