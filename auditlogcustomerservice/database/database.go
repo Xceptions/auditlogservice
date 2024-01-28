@@ -34,7 +34,7 @@ func ConnectMongoDB() *mongo.Database {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
 	// Getting the DB Name from .env
-	audit_db_name := os.Getenv("AUDIT_DB_NAME")
+	audit_db_name := os.Getenv("MONGO_DBNAME")
 
 	// set client options
 	clientOptions := options.Client().ApplyURI("mongodb://kene:kenepass@127.0.0.1:27017")
