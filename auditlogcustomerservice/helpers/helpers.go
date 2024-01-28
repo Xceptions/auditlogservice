@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	// "time"
+	"golang.org/x/time/rate"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -65,4 +65,18 @@ func IsAuthorized(w http.ResponseWriter, userToken string) string {
 	user := fmt.Sprintf("%v", claims["user"])
 
 	return user
+}
+
+// rate limiting to help us limit the number of calls to our
+// api
+func RateLimiter(next http.HandlerFunc) http.HandlerFunc {
+	limiter := rate.NewLimiter(2, 4)
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if !limiter.Allow() {
+			http.Error(w, http.StatusText(429), http.StatusTooManyRequests)
+			return
+		} else {
+			next(w, r)
+		}
+	})
 }

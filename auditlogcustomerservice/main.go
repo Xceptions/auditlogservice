@@ -8,6 +8,7 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/xceptions/auditlogservice/auditlogcustomerservice/database"
 	"github.com/xceptions/auditlogservice/auditlogcustomerservice/handlers"
+	"github.com/xceptions/auditlogservice/auditlogcustomerservice/helpers"
 )
 
 // returns 404 error for non-existent urls
@@ -17,6 +18,10 @@ func error404(w http.ResponseWriter, r *http.Request) {
 
 // HTTP server will be used for querying
 // audit logs
+
+// TODO: Perform rate-limiting by client ip address
+// because currently, I am rate-limiting the whole
+// application
 func spinUpHTTPServer() {
 	log.Println("Starting HTTP Server...")
 
@@ -31,7 +36,7 @@ func spinUpHTTPServer() {
 	apiVersion1.NotFoundHandler = http.HandlerFunc(error404)
 
 	apiVersion1.HandleFunc("/createuser", h.CreateQueryAccount).Methods(http.MethodPost)
-	apiVersion1.HandleFunc("/getevents/{field}/{value}", h.QueryEventsByFieldAndValue).Methods(http.MethodGet)
+	apiVersion1.HandleFunc("/getevents/{field}/{value}", helpers.RateLimiter(h.QueryEventsByFieldAndValue)).Methods(http.MethodGet)
 
 	// router.HandleFunc("/createuser", h.CreateQueryAccount).Methods(http.MethodPost)
 
