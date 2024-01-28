@@ -1,0 +1,3 @@
+CREATE DATABASE auditLogProject;
+CREATE USER kene WITH PASSWORD 'kenepass';
+GRANT ALL PRIVILEGES ON DATABASE "auditLogProject" to kene;
