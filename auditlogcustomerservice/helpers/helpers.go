@@ -70,7 +70,7 @@ func IsAuthorized(w http.ResponseWriter, userToken string) string {
 // rate limiting to help us limit the number of calls to our
 // api
 func RateLimiter(next http.HandlerFunc) http.HandlerFunc {
-	limiter := rate.NewLimiter(2, 4)
+	limiter := rate.NewLimiter(10, 12)
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if !limiter.Allow() {
 			http.Error(w, http.StatusText(429), http.StatusTooManyRequests)

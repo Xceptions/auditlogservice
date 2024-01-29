@@ -14,6 +14,7 @@ import (
 	"github.com/xceptions/auditlogservice/auditlogcustomerservice/helpers"
 	"github.com/xceptions/auditlogservice/auditlogcustomerservice/models"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Receives: response and request writers
@@ -54,7 +55,7 @@ func (h handler) QueryEventsByFieldAndValue(w http.ResponseWriter, r *http.Reque
 	DB := database.ConnectMongoDB()
 	collection := DB.Collection(collectionName)
 
-	filter := bson.D{{field, value}}
+	filter := bson.D{primitive.E{Key: field, Value: value}}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		panic(err)

@@ -20,7 +20,8 @@ import (
 // but the mongodb is used for storing events
 
 func ConnectPostgresDB() *gorm.DB {
-	dbURL := "postgresql://kene:kenepass@localhost:5432/postgres"
+	err := godotenv.Load(".env")
+	dbURL := os.Getenv("POSTGRES_CONN")
 
 	db, err := gorm.Open(postgres.Open(dbURL), &gorm.Config{})
 	helpers.HandleErr(err)
