@@ -12,16 +12,16 @@ import (
 
 var db *mongo.Database
 
-func ConnectDB() *mongo.Database {
+func ConnectMongoDB() *mongo.Database {
 	err := godotenv.Load(".env")
 	if err != nil {
 		log.Fatalf("Error loading .env file: %s", err)
 	}
 	// Getting the DB Name from .env
-	audit_db_name := os.Getenv("AUDIT_DB_NAME")
+	mongo_db := os.Getenv("MONGO_DBNAME")
 
 	// set client options
-	clientOptions := options.Client().ApplyURI("mongodb://kene:kenepass@127.0.0.1:27017")
+	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_CONNECTION"))
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.Background(), clientOptions)
@@ -36,6 +36,6 @@ func ConnectDB() *mongo.Database {
 	}
 
 	// set the database and collection variables
-	db = client.Database(audit_db_name)
+	db = client.Database(mongo_db)
 	return db
 }

@@ -20,7 +20,7 @@ func PushEventsToBuffer(bufferedChannel chan []byte, conn net.Conn) {
 		n, err := conn.Read(buffer)
 		if err != nil {
 			fmt.Println("read error: ", err)
-			continue // to continue listening for connections
+			break // to continue listening for connections
 		}
 		bufferedChannel <- buffer[:n]
 	}

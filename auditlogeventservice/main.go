@@ -1,8 +1,7 @@
 package main
 
 import (
-	// "fmt"
-	"crypto/rand"
+	"fmt"
 	"log"
 	"net"
 
@@ -11,14 +10,8 @@ import (
 
 // TCP server will be used for accepting
 // audit log
-func spinUpTCPServer() {
-	log.Println("spinning up tcp server")
-	token := make([]byte, 4)
-	rand.Read(token)
-	bufferedChannel := make(chan []byte, 4)
-	bufferedChannel <- token
-	bufferedChannel <- token
-	bufferedChannel <- token
+func spinUpTCPServer(bufferedChannel chan []byte) {
+	log.Println("spinning up tcp server...")
 
 	const (
 		CONN_HOST = "localhost"
@@ -37,11 +30,39 @@ func spinUpTCPServer() {
 		if err != nil {
 			log.Fatal("Error accepting: ", err.Error())
 		}
-		go handlers.HandleEvent(bufferedChannel, conn)
+
+		isAuthenticated := true
+		if isAuthenticated {
+			go handlers.PushEventsToBuffer(bufferedChannel, conn)
+		}
 	}
 }
 
 // starts servers
 func main() {
-	spinUpTCPServer()
+	// general channel that module will make use of
+	bufferedChannel := make(chan []byte, 4)
+	go spinUpTCPServer(bufferedChannel)
+
+	// deciding limit to use for insertMany operation
+	insertManyLimit := 5
+
+	// holding the events in bulk, a second buffer
+	// will go ahead to initialize it here
+	var eventsSlice [][]byte
+	eventsSlice = [][]byte{}
+
+	for events := range bufferedChannel {
+		fmt.Println("The len of buffer is: ", len(bufferedChannel))
+
+		eventsSlice = append(eventsSlice, events)
+		fmt.Println("The len of eventsSlice is: ", len(eventsSlice))
+
+		if len(eventsSlice) == insertManyLimit {
+
+			go handlers.PushEventToDB(eventsSlice)
+			eventsSlice = [][]byte{} // clear the event slice
+			fmt.Println("the len of eventsSize in the main thread is: ", len(eventsSlice))
+		}
+	}
 }
