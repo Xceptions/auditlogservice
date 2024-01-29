@@ -2,9 +2,8 @@ package helpers
 
 import (
 	"fmt"
+	"net"
 	"net/http"
-
-	// "time"
 
 	"github.com/golang-jwt/jwt"
 	"golang.org/x/crypto/bcrypt"
@@ -65,4 +64,10 @@ func IsAuthorized(w http.ResponseWriter, userToken string) string {
 	user := fmt.Sprintf("%v", claims["user"])
 
 	return user
+}
+
+// checks if tcp connection is authenticated
+// TODO: use TLS
+func TCPConnectionIsAuthenticated(conn net.Conn) bool {
+	return true
 }

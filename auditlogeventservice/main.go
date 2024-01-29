@@ -6,6 +6,7 @@ import (
 	"net"
 
 	"github.com/xceptions/auditlogservice/auditlogeventservice/handlers"
+	"github.com/xceptions/auditlogservice/auditlogeventservice/helpers"
 )
 
 // TCP server will be used for accepting
@@ -31,14 +32,15 @@ func spinUpTCPServer(bufferedChannel chan []byte) {
 			log.Fatal("Error accepting: ", err.Error())
 		}
 
-		isAuthenticated := true
-		if isAuthenticated {
+		if helpers.TCPConnectionIsAuthenticated(conn) {
 			go handlers.PushEventsToBuffer(bufferedChannel, conn)
 		}
 	}
 }
 
-// starts servers
+// starts servers, creates a buffered channel that is threadsafe
+// spins up a tcp server, then watches the buffered channel
+// for when we have our insert limit
 func main() {
 	// general channel that module will make use of
 	bufferedChannel := make(chan []byte, 4)
@@ -53,13 +55,8 @@ func main() {
 	eventsSlice = [][]byte{}
 
 	for events := range bufferedChannel {
-		fmt.Println("The len of buffer is: ", len(bufferedChannel))
-
 		eventsSlice = append(eventsSlice, events)
-		fmt.Println("The len of eventsSlice is: ", len(eventsSlice))
-
 		if len(eventsSlice) == insertManyLimit {
-
 			go handlers.PushEventToDB(eventsSlice)
 			eventsSlice = [][]byte{} // clear the event slice
 			fmt.Println("the len of eventsSize in the main thread is: ", len(eventsSlice))
