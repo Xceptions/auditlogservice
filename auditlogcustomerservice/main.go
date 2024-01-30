@@ -2,7 +2,6 @@ package main
 
 import (
 	// "fmt"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -75,7 +74,6 @@ func main() {
 	for events := range bufferedChannel {
 		eventsSlice = append(eventsSlice, events)
 		if len(eventsSlice) == insertManyTrigger {
-			fmt.Println("insert many trigger reached")
 			go handlers.PushEventToDB(eventsSlice)
 			eventsSlice = [][]byte{} // clear the event slice
 		}

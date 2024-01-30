@@ -24,7 +24,6 @@
 
 seq 1 13 | xargs -n1 -P13  curl -X POST http://localhost:80/api/v1/submitevent \
                                 -H 'Content-Type: application/json' \
-                                -H 'Authorization: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJ1c2VyIjoidXNlZnVsVXNlcjIifQ.EKkNaVLLFmHsepO3TPo7RGa4OSN_rrTM6yRuvEmq3Mc' \
                                 -d '{"customer": "OdogwuPlentyFromContainer", "eventtype": "payingDues", "specifics": {"what":"light bills", "for_month": "June"}}'
 
 
