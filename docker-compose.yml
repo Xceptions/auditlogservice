@@ -67,6 +67,12 @@ services:
       - "6379:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
+  web:
+    build: ./nginx
+    ports:
+      - "80:80"
+    depends_on:
+      - auditlogcustomerservice
   # web:
   #   restart: always
   #   build: ./web
