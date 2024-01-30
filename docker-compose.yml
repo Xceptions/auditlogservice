@@ -67,7 +67,7 @@ services:
       - "6379:6379"
     healthcheck:
       test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
-  web:
+  nginx:
     build: ./nginx
     ports:
       - "80:80"

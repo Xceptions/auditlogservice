@@ -40,7 +40,7 @@ func ConnectMongoDB() *mongo.Database {
 	audit_db_name := os.Getenv("MONGO_DBNAME")
 
 	// set client options
-	clientOptions := options.Client().ApplyURI("mongodb://kene:kenepass@127.0.0.1:27017")
+	clientOptions := options.Client().ApplyURI(os.Getenv("MONGO_CONN"))
 
 	// Connect to MongoDB
 	client, err := mongo.Connect(context.Background(), clientOptions)
