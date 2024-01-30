@@ -6,39 +6,39 @@ services:
     ports:
         - "4000:4000"
     depends_on: 
-      # mongodb:
-      #   condition: service_healthy
+      mongo:
+        condition: service_healthy
       redis:
         condition: service_healthy
       postgres:
         condition: service_healthy
-  # mongodb:
-  #   image: mongo:latest
-  #   container_name: mongodb
-  #   restart: unless-stopped
-  #   environment:
-  #     MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
-  #     MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-  #   ports:
-  #     - 27017:27017
-  #   healthcheck:
-  #     test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
-  #     interval: 10s
-  #     timeout: 10s
-  #     retries: 3
-  #     start_period: 20s
-  # mongo-express:
-  #   image: mongo-express
-  #   container_name: mongo-express
-  #   restart: unless-stopped
-  #   ports:
-  #     - 8081:8081
-  #   environment:
-  #     ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
-  #     ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
-  #     ME_CONFIG_MONGODB_SERVER: mongodb
-  #   depends_on:
-  #     - mongodb
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+    ports:
+      - 27017:27017
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh mongo:27017/test --quiet
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+  mongo-express:
+    image: mongo-express
+    container_name: mongo-express
+    restart: unless-stopped
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_PASSWORD}
+      ME_CONFIG_MONGODB_SERVER: mongo
+    depends_on:
+      - mongo
   postgres:
     container_name: postgres
     image: postgres:latest
@@ -84,25 +84,3 @@ services:
       - "/etc/nginx/certs"
     depends_on:
       - auditlogcustomerservice
-  # web:
-  #   restart: always
-  #   build: ./web
-  #   expose:
-  #     - "8000"
-  #   links:
-  #     - postgres:postgres
-  #   volumes:
-  #     - /usr/src/flask-app/static
-  #   env_file: .env
-  #   command: /usr/local/bin/gunicorn -w 2 -b :8000 app:app
-  # nginx:
-  #   restart: always
-  #   build: ./nginx/
-  #   ports:
-  #     - "80:80"
-  #   volumes:
-  #     - /www/static
-  #   volumes_from:
-  #     - web
-  #   links:
-  #     - web:web
