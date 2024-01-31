@@ -115,3 +115,9 @@ To test the application, there are five files that contain curl commands for the
 ./curl_seq_submitevent.sh
 ./curl_testqueryendpoint.sh
 ```
+
+These files can also be executed directly
+```
+chmod +x ./curl_seq_submitevent.sh
+./curl_seq_submitevent.sh     
+```
