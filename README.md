@@ -18,19 +18,21 @@ Then there are features:
 
 ### My approach
 
-If you look at the root of the application, you will be met with 6 files:
+If you look at the root of the application, you will be met with 8 files (minus the .sh scripts):
 
 1. auditlogeventservice
 2. auditlogcustomerservice
-3. curlrequests.sh
-4. docker-compose
-5. imageforreadme
-6. readme
-7. .env
+3. docker-compose
+4. imageforreadme
+5. readme
+6. .env
+7. nginx
+8. db-init-scripts
 
-The assignment is in `auditlogcustomerservice`, can be deployed using the `docker-compose` file, and tested using the `curlrequests.sh`.
+The assignment is in `auditlogcustomerservice`, it can be deployed using the `docker-compose` file, and tested using the `.sh` scripts.
 
 The reason there is an `auditlogeventservice` file
+
 *From my understanding of the service, the events will be received from different systems which can send events at any time. This seems to me like a http endpoint will not be the best way to approach this, rather a TCP connection to these systems will be better. This is why I added `auditlogeventservice`. It contains a tcp listener. A TCP listener is faster than a http one, and ensures correct order of events, this will help us to treat the event reception as a stream and handle appropriately*
 
 Despite my opinion, I have followed the instruction in the email. It is contained in `auditlogcustomerservice`, and will now explain my approach.
@@ -42,15 +44,40 @@ Looking at the `docker-compose.yml` file, you will see various services
 4. postgres - choice database for storing user detail. The reason for this choice is the ability to make aggregations it brings to our data. For example, we may choose to store more user detail like location data, then we need to ask how many users are in that location?
 5. pgadmin - a GUI for viewing postgres
 6. redis - choice cache system for caching get queries
+7. nginx - web server for deploying the application, deploys on port :80
 
 In `auditlogcustomerservice`,
 the `main.go` file
 
 Contains four endpoints
-- createuser: for creating the user account that can send and query the database, returns a jwt token for authentication
-- loginuser: returns a jwt token for authentication
-- submitevent: for submitting the event to the database
-- getevent: for querying the event
+
+1. CreateQueryAccount - For creating the user account that can send and query the database, returns a jwt token for authentication
+```
+API: http://localhost:80/api/v1/createuser (POST)
+Receives: JSON(Username: string, Email: string, Password: string)
+Response: JWT token
+```
+
+2. LoginQueryAccount - To log in a query account, returns a jwt token for authentication
+```
+API: http://localhost:80/api/v1/loginuser (POST)
+Receives: JSON(Username: string, Password: string)
+Response: JWT token
+```
+
+3. SubmitEvent: for submitting the event to the database
+```
+API: http://localhost:80/api/v1/submitevent (POST)
+Receives: JSON()
+Response: Map["event": "received"]
+```
+
+4. GetEvent: for querying the event
+```
+API: http://localhost:80/api/v1/getevents/{key}/{value} (GET)
+Receives: None
+Response: Map[event]
+```
 
 *All files with _test are test files for the appropriate methods*
 
@@ -62,11 +89,29 @@ The overall application has versioning for the APIs
 
 
 To deploy the application:
+
 ```
 docker-compose up -d
 ```
+This starts up all the applications defined in the docker-compose file as containers running on different ports. It also starts up an `nginx` web server that connects to the `auditlogcustomerservice` as entry point.
+The `pgadmin` and `mongoexpress` are currently commented out. You can uncomment them before building the services to have a GUI for accessing the databases.
 
-To test the endpoint:
+To test the application, there are five files that contain curl commands for the various endpoints
+
+1. curl_createqueryaccount.sh - for creating an account to be used for authentication
+
+2. curl_loginqueryaccount.sh - to login the account
+
+3. curl_par_submitevent.sh - to submit events in parallel
+
+4. curl_seq_submitevent.sh - to submit events sequentially
+
+5. curl_testqueryendpoint.sh - to get events based on key-value
+
 ```
-./curlrequests.sh
+./curl_createqueryaccount.sh
+./curl_loginqueryaccount.sh
+./curl_par_submitevent.sh
+./curl_seq_submitevent.sh
+./curl_testqueryendpoint.sh
 ```

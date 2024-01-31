@@ -1,1 +1,1 @@
-curl -X POST -d '{"Username": "HappyUser", "Password": "randompass"}' http://localhost:4000/api/v1/loginuser
+curl -X POST -d '{"Username": "HappyUser", "Password": "randompass"}' http://localhost:80/api/v1/loginuser
