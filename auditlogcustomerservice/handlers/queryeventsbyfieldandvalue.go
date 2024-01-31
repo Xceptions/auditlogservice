@@ -14,7 +14,6 @@ import (
 	"github.com/xceptions/auditlogservice/auditlogcustomerservice/helpers"
 	"github.com/xceptions/auditlogservice/auditlogcustomerservice/models"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 // Receives: response and request writers
@@ -56,7 +55,7 @@ func (h handler) QueryEventsByFieldAndValue(w http.ResponseWriter, r *http.Reque
 	DB := database.ConnectMongoDB()
 	collection := DB.Collection(collectionName)
 
-	filter := bson.D{primitive.E{Key: field, Value: value}}
+	filter := bson.D{{field, value}}
 	cursor, err := collection.Find(context.TODO(), filter)
 	if err != nil {
 		panic(err)
@@ -65,8 +64,8 @@ func (h handler) QueryEventsByFieldAndValue(w http.ResponseWriter, r *http.Reque
 	if err = cursor.All(context.TODO(), &events); err != nil {
 		panic(err)
 	}
-	result := map[string]interface{}{"result": events}
-	resultMarshalled, _ := json.Marshal(result)
+	// result := map[string]interface{}{"result": events}
+	resultMarshalled, _ := json.Marshal(events)
 
 	err = redisClient.Set(context.Background(), r.URL.Path, resultMarshalled, 1*time.Hour).Err()
 	if err != nil {
@@ -75,5 +74,5 @@ func (h handler) QueryEventsByFieldAndValue(w http.ResponseWriter, r *http.Reque
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	json.NewEncoder(w).Encode(resultMarshalled)
+	json.NewEncoder(w).Encode(events)
 }

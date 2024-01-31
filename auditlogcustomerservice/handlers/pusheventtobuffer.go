@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 
@@ -20,5 +21,8 @@ func (h handler) PushEventToBuffer(bufferedChannel chan []byte) http.HandlerFunc
 		// helpers.IsAuthorized(w, userToken)
 
 		bufferedChannel <- []byte(body)
+		w.Header().Add("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		json.NewEncoder(w).Encode(map[string]interface{}{"result": "event received!"})
 	}
 }
