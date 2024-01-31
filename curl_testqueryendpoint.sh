@@ -1,0 +1,1 @@
+curl -X GET http://localhost:80/api/v1/getevents/eventtype/WantsNigeriaToWin
