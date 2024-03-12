@@ -1,4 +1,4 @@
-## Audit Log Service
+## Audit Event Log Service
 
 **System for receiving events of any structure, and querying them**
 ![alt text](./imageforreadme/design.png)
@@ -6,7 +6,7 @@
 
 ### Overview
 
-Based on the instruction, there are two main components
+There are two main components
 
 1. Service for accepting events
 2. Service for querying events
@@ -16,9 +16,9 @@ Then there are features:
 1. Authentication
 2. Exposable via a http endpoint
 
-### My approach
+### Approach
 
-If you look at the root of the application, you will be met with 8 files (minus the .sh scripts):
+There are 8 files (minus the .sh scripts):
 
 1. auditlogeventservice
 2. auditlogcustomerservice
@@ -29,13 +29,12 @@ If you look at the root of the application, you will be met with 8 files (minus 
 7. nginx
 8. db-init-scripts
 
-The assignment is in `auditlogcustomerservice`, it can be deployed using the `docker-compose` file, and tested using the `.sh` scripts.
+The http endpoint version is in `auditlogcustomerservice`, it can be deployed using the `docker-compose` file, and tested using the `.sh` scripts.
 
 The reason there is an `auditlogeventservice` file
 
-*From my understanding of the service, the events will be received from different systems which can send events at any time. This seems to me like a http endpoint will not be the best way to approach this, rather a TCP connection to these systems will be better. This is why I added `auditlogeventservice`. It contains a tcp listener. A TCP listener is faster than a http one, and ensures correct order of events, this will help us to treat the event reception as a stream and handle appropriately*
+*The events will be received from different systems which can send them at any time. A http endpoint will not be the best way to approach this, rather a TCP connection to these systems will be better. This is why there is an `auditlogeventservice`. It contains a tcp listener. A TCP listener is faster than a http one, and ensures correct order of events, this will help us to treat the event reception as a stream and handle as appropriate*
 
-Despite my opinion, I have followed the instruction in the email. It is contained in `auditlogcustomerservice`, and will now explain my approach.
 
 Looking at the `docker-compose.yml` file, you will see various services
 1. auditlogcustomerservice - where the application is contained
